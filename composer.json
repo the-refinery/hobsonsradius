@@ -1,0 +1,43 @@
+{
+    "name": "therefinery/hobsons-radius",
+    "description": "Integration with HobsonsRadius",
+    "type": "craft-plugin",
+    "version": "2.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "hobsonsradius"
+    ],
+    "support": {
+        "docs": "https://github.com/the-refinery/hobsonsradius/blob/master/README.md",
+        "issues": "https://github.com/the-refinery/hobsonsradius/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "The Refinery",
+            "homepage": "http://the-refinery.io"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "therefinery\\hobsonsradius\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "HobsonsRadius",
+        "handle": "hobsons-radius",
+        "hasCpSettings": true,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/the-refinery/hobsonsradius/master/CHANGELOG.md",
+        "components": {
+            "hobsonsRadiusService": "therefinery\\hobsonsradius\\services\\HobsonsRadiusService"
+        },
+        "class": "therefinery\\hobsonsradius\\HobsonsRadius"
+    }
+}
