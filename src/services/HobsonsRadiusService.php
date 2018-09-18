@@ -30,8 +30,7 @@ use craft\base\Component;
  */
 class HobsonsRadiusService extends Component
 {
-
-    private $eventFields = array(
+	private $eventFields = array(
 		"Hosts",
 		"Capacity Cutoff Message",
 		"Naviance Event Views",
@@ -71,24 +70,24 @@ class HobsonsRadiusService extends Component
 		"Location"
 	);
 
-	protected static function sendRequest($method, $endpoint, $params)
+	protected function sendRequest($method, $endpoint, $params)
 	{
 		try
 		{
-			$request = self::buildApiRequest($method, $endpoint, $params);
+			$request = $this->buildApiRequest($method, $endpoint, $params);
 
 			$response = curl_exec($request);
 
-		  // Validate CURL status
-		  if(curl_errno($request))
+			// Validate CURL status
+			if(curl_errno($request))
 			{
 				$response = '{"status":500,"message":'.curl_errno($request).'}';
 			}
 
 			// Currently there's no need for this.
-		  // // Validate HTTP status code (user/password credential issues)
-		  // $status_code = curl_getinfo($request, CURLINFO_HTTP_CODE);
-		  // if ($status_code != 200)
+			// // Validate HTTP status code (user/password credential issues)
+			// $status_code = curl_getinfo($request, CURLINFO_HTTP_CODE);
+			// if ($status_code != 200)
 			// {
 			//
 			// }
@@ -114,9 +113,9 @@ class HobsonsRadiusService extends Component
 	 * @param
 	 * @return cURL handle
 	 */
-	protected static function buildApiRequest($method, $endpoint, $params = array())
+	protected function buildApiRequest($method, $endpoint, $params = array())
 	{
-        $settings = Craft::$app->plugins->getPlugin('hobsons-radius')->getSettings();
+		$settings = Craft::$app->plugins->getPlugin('hobsons-radius')->getSettings();
 
 		$url = rtrim($settings->apiBaseUrl, '/') . $endpoint;
 		$username = $settings->webServiceUsername;
@@ -149,7 +148,7 @@ class HobsonsRadiusService extends Component
 		$ch = curl_init();
 
 		curl_setopt_array( $ch, $options );
-
+		
 		return $ch;
 	}
 
@@ -218,7 +217,7 @@ class HobsonsRadiusService extends Component
 		return $entity;
 	}
 
-	protected static function parseResponse($response)
+	protected function parseResponse($response)
 	{
 		try {
 
@@ -269,11 +268,11 @@ class HobsonsRadiusService extends Component
 	 * @param String module ex: Events
 	 * @param Array query
 	 */
-	protected static function getFields($module, $details = false)
+	protected function getFields($module, $details = false)
 	{
 		$params = $details ? array('includeDetails' => true) : array();
 		$endpoint = "/modules/{$module}/fields";
-		$response = self::sendRequest('GET', $endpoint, $params);
+		$response = $this->sendRequest('GET', $endpoint, $params);
 		$fields = $response['payload'];
 		return $fields;
 	}
@@ -290,7 +289,7 @@ class HobsonsRadiusService extends Component
 			$param = $params[$key];
 			return isset($param) ? $param : $default;
 		}
-
+		
 		return $default;
 	}
 
@@ -299,7 +298,7 @@ class HobsonsRadiusService extends Component
 	 *
 	 * @param Array params
 	 */
-	protected static function buildSearchQueryString($params)
+	protected function buildSearchQueryString($params)
 	{
 		$searchKeys = array(
 			'page' => 1,
@@ -322,7 +321,7 @@ class HobsonsRadiusService extends Component
 		else
 		{
 			foreach ($searchKeys as $key => $value) {
-
+				
 				if (isset($params[$key]))
 				{
 					$query[$key] = $params[$key];
@@ -339,7 +338,7 @@ class HobsonsRadiusService extends Component
 		return empty($queryStr) ? '' : "?{$queryStr}";
 	}
 
-	protected static function buildSearchBody($module, $params)
+	protected function buildSearchBody($module, $params)
 	{
 		$requiredKeys = array('returnFields', 'newerThan');
 		$bodyKeys = array_merge($requiredKeys, array(
@@ -356,26 +355,26 @@ class HobsonsRadiusService extends Component
 
 		if (!isset($body['returnFields']))
 		{
-			$body['returnFields'] = self::getFields($module);
+			$body['returnFields'] = $this->getFields($module);
 		}
 
 		if (!isset($body['newerThan']))
 		{
-			// $date = (new DateTime())->modify('-1 year');
-			// $body['newerThan'] = $date->format('n/j/Y h:i A');
+			$date = (new DateTime())->modify('-1 year');
+			$body['newerThan'] = $date->format('n/j/Y h:i A');
 		}
 
 		return $body;
 	}
 
-	protected static function getCachedSearch($module)
+	protected function getCachedSearch($module)
 	{
-		return craft()->cache->get($module);
+		return Craft::$app->cache->get($module);
 	}
 
-	protected static function setCachedSearch($module, $value)
+	protected function setCachedSearch($module, $value)
 	{
-		craft()->cache->set($module, $value, 86400);
+		Craft::$app->cache->set($module, $value, 86400);
 	}
 
 	/**
@@ -385,19 +384,18 @@ class HobsonsRadiusService extends Component
 	 * @param Array query
 	 * @param String format - ex: 'json'
 	 */
-	public static function search($module, $params = array(), $format = null)
+	public function search($module, $params = array(), $format = null)
 	{
-        $response = false;
-        // $response = self::getCachedSearch($module);
+		$response = $this->getCachedSearch($module);
 
 		if ($response == false)
 		{
 			$endpoint = "/modules/{$module}/search";
-			$body = self::buildSearchBody($module, $params);
-			$query = self::buildSearchQueryString($params);
+			$body = $this->buildSearchBody($module, $params);
+			$query = $this->buildSearchQueryString($params);
 			$url = "{$endpoint}{$query}";
-			$response = self::parseResponse(
-				self::sendRequest('POST', $url, $body)
+			$response = $this->parseResponse(
+				$this->sendRequest('POST', $url, $body)
 			);
 			$payload = $response['payload'];
 			$totalPages = (int)$payload['totalPages'];
@@ -434,35 +432,11 @@ class HobsonsRadiusService extends Component
 
 		if ($format == 'json')
 		{
-			JsonHelper::sendJsonHeaders();
-			return TemplateHelper::getRaw(json_encode($response));
+			return json_encode($response);
 		}
 		else
 		{
 			return $response;
 		}
 	}
-
-    // Public Methods
-    // =========================================================================
-
-    /**
-     * This function can literally be anything you want, and you can have as many service
-     * functions as you want
-     *
-     * From any other plugin file, call it like this:
-     *
-     *     HobsonsRadius::$plugin->hobsonsRadiusService->exampleService()
-     *
-     * @return mixed
-     */
-    // public function exampleService()
-    // {
-    //     $result = 'something';
-    //     // Check our Plugin's settings for `someAttribute`
-    //     if (HobsonsRadius::$plugin->getSettings()->someAttribute) {
-    //     }
-
-    //     return $result;
-    // }
 }

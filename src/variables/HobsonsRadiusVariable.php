@@ -10,10 +10,10 @@
 
 namespace therefinery\hobsonsradius\variables;
 
-use Craft;
-
-use therefinery\hobsonsradius\HobsonsRadius as Plugin;
+use therefinery\hobsonsradius\HobsonsRadius;
 use therefinery\hobsonsradius\services\HobsonsRadiusService;
+
+use Craft;
 
 /**
  * HobsonsRadius Variable
@@ -47,17 +47,15 @@ class HobsonsRadiusVariable
      * @return string
      */
 
-	public function searchvariable($module, $params = array())
+	public function search($module, $params = array())
 	{
 		$format = null;
-
 		if (array_key_exists('format', $params))
 		{
 			$format = $params['format'];
 			unset($params['format']);
 		}
-
 		// return craft()->hobsonsRadius->search($module, $params, $format);
-		return HobsonsRadiusService::search($module, $params, $format);
+		return HobsonsRadius::$plugin->hobsonsRadiusService->search($module, $params, $format);
 	}
 }
