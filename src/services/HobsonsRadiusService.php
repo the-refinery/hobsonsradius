@@ -10,10 +10,12 @@
 
 namespace therefinery\hobsonsradius\services;
 
-use therefinery\hobsonsradius\HobsonsRadius;
-
 use Craft;
 use craft\base\Component;
+use craft\helpers\Template;
+use DateTime;
+use therefinery\hobsonsradius\HobsonsRadius;
+
 
 /**
  * HobsonsRadiusService Service
@@ -434,7 +436,7 @@ class HobsonsRadiusService extends Component
 
 		if ($format == 'json')
 		{
-			return json_encode($response);
+			return Template::raw(json_encode($response));
 		}
 		else
 		{
