@@ -367,15 +367,15 @@ class HobsonsRadiusService extends Component
 		return $body;
 	}
 
-	protected function getCachedSearch($module)
-	{
-		return Craft::$app->cache->get($module);
-	}
+	// protected function getCachedSearch($module)
+	// {
+	// 	return Craft::$app->cache->get($module);
+	// }
 
-	protected function setCachedSearch($module, $value)
-	{
-		Craft::$app->cache->set($module, $value, 86400);
-	}
+	// protected function setCachedSearch($module, $value)
+	// {
+	// 	Craft::$app->cache->set($module, $value, 86400);
+	// }
 
 	/**
 	 * Searching module entries
@@ -386,7 +386,9 @@ class HobsonsRadiusService extends Component
 	 */
 	public function search($module, $params = array(), $format = null)
 	{
-		$response = $this->getCachedSearch($module);
+		// $response = $this->getCachedSearch($module);
+
+		$response = null;
 
 		if ($response == false)
 		{
@@ -427,7 +429,7 @@ class HobsonsRadiusService extends Component
 			}
 
 			$response['payload'] = $payload;
-			$this->setCachedSearch($module, $response);
+			// $this->setCachedSearch($module, $response);
 		}
 
 		if ($format == 'json')
